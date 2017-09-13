@@ -1,0 +1,86 @@
+{
+  "project_info": {
+    "project_number": "581193705772",
+    "firebase_url": "https://friendlychat-51815.firebaseio.com",
+    "project_id": "friendlychat-51815",
+    "storage_bucket": "friendlychat-51815.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:581193705772:android:64e58dacc0483faa",
+        "android_client_info": {
+          "package_name": "com.google.firebase.udacity.friendlychat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "581193705772-97aim3etvf7nj8mmh8be4dvbstukc3e2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.google.firebase.udacity.friendlychat",
+            "certificate_hash": "cfec93c20eaf9d3f1cc9f3af8ea21c1f2344a44c"
+          }
+        },
+        {
+          "client_id": "581193705772-8jto4tvdp1lp4o7e0fsiqnmif4isi47l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLPFuCf0xzuk1KVfLpJ-Q1B85h_bkL-2E"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "581193705772-8jto4tvdp1lp4o7e0fsiqnmif4isi47l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:581193705772:android:cae4fd596917c098",
+        "android_client_info": {
+          "package_name": "com.example.aarshad.socialappstart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "581193705772-8jto4tvdp1lp4o7e0fsiqnmif4isi47l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLPFuCf0xzuk1KVfLpJ-Q1B85h_bkL-2E"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
