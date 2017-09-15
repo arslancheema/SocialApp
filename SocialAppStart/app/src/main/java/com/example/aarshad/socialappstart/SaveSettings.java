@@ -15,14 +15,14 @@ public class SaveSettings {
         ShredRef=context.getSharedPreferences("myRef",Context.MODE_PRIVATE);
     }
 
-    void SaveData(String UserID){
+    void saveData(String UserID){
 
         SharedPreferences.Editor editor=ShredRef.edit();
         editor.putString("UserID",UserID);
          editor.commit();
     }
 
-    void LoadData(){
+    void loadData(){
         UserID= ShredRef.getString("UserID","0");
         if (UserID.equals("0")){
 

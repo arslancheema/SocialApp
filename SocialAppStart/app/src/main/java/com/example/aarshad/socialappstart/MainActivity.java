@@ -1,28 +1,18 @@
 package com.example.aarshad.socialappstart;
 
 
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.SearchView;
 
 
@@ -35,21 +25,25 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<AdapterItems> listnewsData = new ArrayList<AdapterItems>();
     int StartFrom=0;
-    int UserOperation=SearchType.MyFollowing;
-    String Searchquery;
+    int userOperation =SearchType.MyFollowing;
+    String searchquery;
     int totalItemCountVisible=0;
-    LinearLayout ChannelInfo;
+    LinearLayout channelInfo;
     TextView txtnamefollowers;
-    int SelectedUserID=0;
+    int selectedUserID =0;
     Button buFollow;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ChannelInfo=(LinearLayout)findViewById(R.id.ChannelInfo) ;
-        ChannelInfo.setVisibility(View.GONE);
+        channelInfo =(LinearLayout)findViewById(R.id.ChannelInfo) ;
+        channelInfo.setVisibility(View.GONE);
         txtnamefollowers=(TextView)findViewById(R.id.txtnamefollowers) ;
         buFollow=(Button)findViewById(R.id.buFollow);
+
+        // Data Setttings
+        SaveSettings saveSettings = new SaveSettings(getApplicationContext());
+        saveSettings.loadData();
 
 
         ListView lsNews=(ListView)findViewById(R.id.LVNews);
@@ -79,10 +73,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
 
-                Searchquery=null;
+                searchquery =null;
                 try {
                     //for space with name
-                    Searchquery = java.net.URLEncoder.encode(query , "UTF-8");
+                    searchquery = java.net.URLEncoder.encode(query , "UTF-8");
                 } catch (UnsupportedEncodingException e) {
 
                 }
