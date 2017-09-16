@@ -4,7 +4,9 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -20,10 +23,20 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Login extends AppCompatActivity {
     EditText etName;
@@ -73,8 +86,48 @@ public class Login extends AppCompatActivity {
 
     }
 
-    public void buLogin(View view) {
+    public void loginButtonPressed(View view) {
+        showProgressDialog();
+        FirebaseStorage storage=FirebaseStorage.getInstance();
+        // Create a storage reference from our app
+        StorageReference storageRef = storage.getReferenceFromUrl("gs://friendlychat-51815.appspot.com");
+        SimpleDateFormat df = new SimpleDateFormat("ddMMyyHHmmss");
+        Date dateobj = new Date();
 
+        final String ImagePath= df.format(dateobj) +".jpg";
+        StorageReference mountainsRef = storageRef.child("images/"+ ImagePath);
+        ivUserImage.setDrawingCacheEnabled(true);
+        ivUserImage.buildDrawingCache();
+        // Bitmap bitmap = imageView.getDrawingCache();
+        BitmapDrawable drawable=(BitmapDrawable)ivUserImage.getDrawable();
+        Bitmap bitmap =drawable.getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        UploadTask uploadTask = mountainsRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                String downloadUrl = taskSnapshot.getDownloadUrl().toString();
+                String name = "";
+                try {
+                    name = java.net.URLEncoder.encode( etName.getText().toString() , "UTF-8");
+                    downloadUrl= java.net.URLEncoder.encode(downloadUrl , "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+
+                }
+
+                hideProgressDialog();
+
+            }
+        });
     }
 
     @Override

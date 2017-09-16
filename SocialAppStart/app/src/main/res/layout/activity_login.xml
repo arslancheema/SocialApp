@@ -74,7 +74,7 @@
 
             android:textSize="20dp"
             android:textColor="#fdfffa"
-            android:onClick="buLogin"
+            android:onClick="loginButtonPressed"
             android:layout_weight="0.08" />
 
     </LinearLayout>
