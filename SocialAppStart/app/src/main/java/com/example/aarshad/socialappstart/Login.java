@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -33,8 +34,16 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -118,13 +127,18 @@ public class Login extends AppCompatActivity {
                 String downloadUrl = taskSnapshot.getDownloadUrl().toString();
                 String name = "";
                 try {
+                    // Name with space and URL as it is won't work if we pass so we need encoding
                     name = java.net.URLEncoder.encode( etName.getText().toString() , "UTF-8");
                     downloadUrl= java.net.URLEncoder.encode(downloadUrl , "UTF-8");
+
                 } catch (UnsupportedEncodingException e) {
 
+                    Log.e(TAG,"Exception in Encoding");
                 }
 
-                hideProgressDialog();
+                String url="http://10.0.2.2:8888/SocialAppServer/Register.php?first_name="+name+"&password="+etPassword.getText().toString()+"&picture_path=abc&email="+etEmail.getText().toString();
+                Log.d(TAG, "URL: " + url );
+                new MyAsyncTaskgetNews().execute(url);
 
             }
         });
@@ -146,7 +160,7 @@ public class Login extends AppCompatActivity {
         hideProgressDialog();
     }
     private void signInAnonymously() {
-
+        // Firstly we need to enable Anonymous login on Firebase.
         mAuth.signInAnonymously()
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -245,4 +259,85 @@ public class Login extends AppCompatActivity {
 
         }
     }
+
+
+
+    // get news from server
+    public class MyAsyncTaskgetNews extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            //before works
+        }
+        @Override
+        protected String  doInBackground(String... params) {
+            // TODO Auto-generated method stub
+            try {
+                String NewsData;
+                //define the url we have to connect with
+                URL url = new URL(params[0]);
+                //make connect with url and send request
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                //waiting for 7000ms for response
+                urlConnection.setConnectTimeout(10000);//set timeout to 5 seconds
+
+                try {
+                    //getting the response data
+                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                    //convert the stream to string
+                    Operations operations=new Operations(getApplicationContext());
+                    NewsData = operations.ConvertInputToStringNoChange(in);
+                    //send to display data
+                    publishProgress(NewsData);
+                } catch (IOException e){
+                    Log.e(TAG,"Error in Reading " + e.getMessage());
+                }
+                finally {
+                    //end connection
+                    urlConnection.disconnect();
+                }
+
+            }catch (Exception ex){}
+            return null;
+        }
+        protected void onProgressUpdate(String... progress) {
+
+            try {
+                Log.d(TAG,"Result : " +progress[0]);
+                JSONObject json = new JSONObject(progress[0]);
+                //display response data
+                if (json.getString("msg") == null)
+                    return;
+
+
+                if (json.getString("msg").equalsIgnoreCase("user is added")) {
+                    Log.d(TAG,"User has been Added");
+                    Toast.makeText(getApplicationContext(), json.getString("msg"), Toast.LENGTH_LONG).show();
+
+                    String url="http://10.0.2.2:8888/SocialAppServer/Login.php?email="+etEmail.getText().toString()+"&password="+etPassword.getText().toString() ;
+
+                    new MyAsyncTaskgetNews().execute(url);
+                }
+
+                if (json.getString("msg").equalsIgnoreCase("Pass Login")) {
+                    Log.d(TAG,"User Logged in");
+                    JSONArray UserInfo=new JSONArray( json.getString("info"));
+                    JSONObject UserCreintal= UserInfo.getJSONObject(0);
+                    //Toast.makeText(getApplicationContext(),UserCreintal.getString("user_id"),Toast.LENGTH_LONG).show();
+                    hideProgressDialog();
+                    SaveSettings saveSettings= new SaveSettings(getApplicationContext());
+                    saveSettings.saveData(UserCreintal.getString("user_id"));
+                    finish(); //close this activity
+                }
+
+            } catch (Exception ex) {
+                Log.d("er",  ex.getMessage());
+            }
+        }
+
+        protected void onPostExecute(String  result2){
+
+        }
+
+    }
+
 }
