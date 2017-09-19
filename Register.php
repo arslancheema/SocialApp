@@ -8,7 +8,7 @@ $result = mysqli_query($connect,$query);
 if (!result){
 	$info = "{'msg':'cannot insert into db'}";
 } else {
-	$info = "{'msg':'Inserted into db'}";
+	$info = "{'msg':'user is added'}";
 }
 
 print($info);

@@ -20,6 +20,7 @@ public class SaveSettings {
         SharedPreferences.Editor editor=ShredRef.edit();
         editor.putString("UserID",UserID);
          editor.commit();
+        loadData();
     }
 
     void loadData(){

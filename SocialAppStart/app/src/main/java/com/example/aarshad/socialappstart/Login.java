@@ -321,11 +321,11 @@ public class Login extends AppCompatActivity {
                 if (json.getString("msg").equalsIgnoreCase("Pass Login")) {
                     Log.d(TAG,"User Logged in");
                     JSONArray UserInfo=new JSONArray( json.getString("info"));
-                    JSONObject UserCreintal= UserInfo.getJSONObject(0);
-                    //Toast.makeText(getApplicationContext(),UserCreintal.getString("user_id"),Toast.LENGTH_LONG).show();
+                    JSONObject userCredentials= UserInfo.getJSONObject(0);
+                    //Toast.makeText(getApplicationContext(),userCredentials.getString("user_id"),Toast.LENGTH_LONG).show();
                     hideProgressDialog();
                     SaveSettings saveSettings= new SaveSettings(getApplicationContext());
-                    saveSettings.saveData(UserCreintal.getString("user_id"));
+                    saveSettings.saveData(userCredentials.getString("user_id"));
                     finish(); //close this activity
                 }
 

@@ -16,9 +16,9 @@ while ($row = mysqli_fetch_assoc($result)) {
 }
 
 if ($userinfo){
-	print("{'message':'Login Passed', 'info':'".json_encode($userinfo)."' }");
+	print("{'msg':'Pass Login', 'info':'".json_encode($userinfo)."' }");
 } else {
-	print("{'message':'Login Failed' ");
+	print("{'msg':'Login Failed' ");
 }
 
 mysqli_free_result($result);
