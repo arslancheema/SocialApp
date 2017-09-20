@@ -6,10 +6,15 @@ import android.content.Context;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -32,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     TextView txtnamefollowers;
     int selectedUserID =0;
     Button buFollow;
+    MyCustomAdapter myCustomAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,9 +52,13 @@ public class MainActivity extends AppCompatActivity {
         SaveSettings saveSettings = new SaveSettings(getApplicationContext());
         saveSettings.loadData();
 
-
+        listnewsData.add(new AdapterItems(null,null,null,"add",null,null,null));
+        listnewsData.add(new AdapterItems(null,null,null,"loading",null,null,null));
+        listnewsData.add(new AdapterItems(null,null,null,"notweet",null,null,null));
+        listnewsData.add(new AdapterItems(null,null,null,"else",null,null,null));
+        myCustomAdapter=new MyCustomAdapter(this,listnewsData);
         ListView lsNews=(ListView)findViewById(R.id.LVNews);
-        // lsNews.setAdapter(myadapter);//intisal with data
+        lsNews.setAdapter(myCustomAdapter);
 
     }
 
@@ -107,8 +118,97 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    private class MyCustomAdapter extends BaseAdapter {
+        public ArrayList<AdapterItems> listnewsDataAdpater ;
+        Context context;
+        public MyCustomAdapter(Context context,ArrayList<AdapterItems>  listnewsDataAdpater) {
+            this.listnewsDataAdpater=listnewsDataAdpater;
+            this.context=context;
+        }
 
 
+        @Override
+        public int getCount() {
+            return listnewsDataAdpater.size();
+        }
+
+        @Override
+        public String getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            final AdapterItems s = listnewsDataAdpater.get(position);
+            // inflating different layouts depending on the tweet_date
+            if(s.tweet_date.equals("add")) {
+                LayoutInflater mInflater = getLayoutInflater();
+                View myView = mInflater.inflate(R.layout.tweet_add, null);
+
+                final EditText etPost = (EditText) myView.findViewById(R.id.etPost);
+                ImageView iv_post=(ImageView) myView.findViewById(R.id.iv_post) ;
+
+                ImageView iv_attach=(ImageView) myView.findViewById(R.id.iv_attach) ;
+                iv_attach.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                    }
+                });
+                iv_post.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                    // TODO:
+                    }
+                });
+
+                return myView;
+            }
+            else if(s.tweet_date.equals("loading")) {
+                LayoutInflater mInflater = getLayoutInflater();
+                View myView = mInflater.inflate(R.layout.tweet_loading, null);
+                return myView;
+            }
+            else if(s.tweet_date.equals("notweet")) {
+                LayoutInflater mInflater = getLayoutInflater();
+                View myView = mInflater.inflate(R.layout.tweet_msg, null);
+                return myView;
+            }
+
+
+            else {
+                LayoutInflater mInflater = getLayoutInflater();
+                View myView = mInflater.inflate(R.layout.tweet_item, null);
+
+                TextView txtUserName = (TextView) myView.findViewById(R.id.txtUserName);
+                txtUserName.setText(s.first_name);
+                txtUserName.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                      // TODO;
+
+                    }
+                });
+                TextView txt_tweet = (TextView) myView.findViewById(R.id.txt_tweet);
+                txt_tweet.setText(s.tweet_text);
+
+                TextView txt_tweet_date = (TextView) myView.findViewById(R.id.txt_tweet_date);
+                txt_tweet_date.setText(s.tweet_date);
+                // TODO: Picasso Loading
+                ImageView tweet_picture=(ImageView)myView.findViewById(R.id.tweet_picture);
+
+                ImageView picture_path=(ImageView)myView.findViewById(R.id.picture_path);
+
+                return myView;
+            }
+        }
+
+    }
 
 
 }
