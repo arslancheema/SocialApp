@@ -325,6 +325,7 @@ public class Login extends AppCompatActivity {
                     //Toast.makeText(getApplicationContext(),userCredentials.getString("user_id"),Toast.LENGTH_LONG).show();
                     hideProgressDialog();
                     SaveSettings saveSettings= new SaveSettings(getApplicationContext());
+                    Log.v(TAG,"UserID: " + userCredentials.getString("user_id"));
                     saveSettings.saveData(userCredentials.getString("user_id"));
                     finish(); //close this activity
                 }
