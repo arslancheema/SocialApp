@@ -29,7 +29,6 @@
         android:background="@drawable/background"
         android:paddingTop="2dp"
         android:paddingBottom="1dp"
-        android:descendantFocusability="blocksDescendants"
 
         >
 
@@ -38,10 +37,8 @@
             android:layout_width="match_parent"
             android:layout_height="50pt"
             android:inputType="textMultiLine"
-            android:text="Tweet of .."
             android:ems="10"
             android:id="@+id/etPost"
-
             android:hint="What you think?" />
 
 

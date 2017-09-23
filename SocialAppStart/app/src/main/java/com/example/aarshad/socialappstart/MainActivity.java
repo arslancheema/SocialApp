@@ -379,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (json.getString("msg").equalsIgnoreCase("tweet is added")) {
                     Log.v("MainActivity", "Tweet is added");
-                    loadTweets(1, userOperation);
+                    loadTweets(0, userOperation);
                 } else if (json.getString("msg").equalsIgnoreCase("has tweet")) {
                     Log.v("MainActivity", "Has Tweet If ");
                     if (StartFrom == 0) {
