@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     MyCustomAdapter myCustomAdapter;
 
     String downloadUrl = null;
+    ImageView iv_attach;
 
 
     @Override
@@ -184,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                 final EditText etPost = (EditText) myView.findViewById(R.id.etPost);
                 ImageView iv_post = (ImageView) myView.findViewById(R.id.iv_post);
 
-                ImageView iv_attach = (ImageView) myView.findViewById(R.id.iv_attach);
+                 iv_attach = (ImageView) myView.findViewById(R.id.iv_attach);
                 iv_attach.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -203,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
                             tweets = ".";
                         }
                         String url = "http://10.0.2.2:8888/SocialAppServer/TweetAdd.php?user_id=" + SaveSettings.UserID + "&tweet_text=" + tweets + "&tweet_picture=" + downloadUrl;
-                        Log.v("MainActivity", "URL: " + url);
+
                         new MyAsyncTaskgetNews().execute(url);
                         etPost.setText("");
                     }
@@ -271,11 +272,10 @@ public class MainActivity extends AppCompatActivity {
     int RESULT_LOAD_IMAGE = 233;
 
     void loadImage() {
-        Intent i = new Intent(
-                Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
-        startActivityForResult(i, RESULT_LOAD_IMAGE);
+        Intent intent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, RESULT_LOAD_IMAGE);
+
     }
 
     @Override
@@ -283,33 +283,27 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            iv_attach.setImageBitmap(bitmap);
 
-            Cursor cursor = getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-
-            uploadImage(BitmapFactory.decodeFile(picturePath));
+            uploadImage();
         }
     }
 
 
-    public void uploadImage(Bitmap bitmap) {
-        showProgressDialog();
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        // Create a storage reference from our app
-        StorageReference storageRef = storage.getReferenceFromUrl("gs://friendlychat-51815.appspot.com");
-        DateFormat df = new SimpleDateFormat("ddMMyyHHmmss");
-        Date dateObj = new Date();
+    public void uploadImage() {
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Uploading");
+        progressDialog.show();
 
-        String myDownloadUrl = SaveSettings.UserID + "_" + df.format(dateObj) + ".jpg";
-        StorageReference mountainsRef = storageRef.child("images/" + myDownloadUrl);
+        StorageReference storageRef= FirebaseStorage.getInstance().getReference();
 
+        StorageReference mountainsRef = storageRef.child("images/pc.jpg");
+
+
+        iv_attach.setDrawingCacheEnabled(true);
+        iv_attach.buildDrawingCache();
+        Bitmap bitmap = iv_attach.getDrawingCache();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
@@ -318,15 +312,14 @@ public class MainActivity extends AppCompatActivity {
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                Log.e("MainActivity", "Error in uploading the post picture");
+                // Handle unsuccessful uploads
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                downloadUrl = taskSnapshot.getDownloadUrl().toString();
-                Log.v("MainActivity", "Post Image Uploaded");
-                hideProgressDialog();
+                  downloadUrl = taskSnapshot.getDownloadUrl().toString();
+                progressDialog.dismiss();
             }
         });
     }
@@ -347,6 +340,7 @@ public class MainActivity extends AppCompatActivity {
                 String NewsData;
                 //define the url we have to connect with
                 URL url = new URL(params[0]);
+                Log.v("MainActivity", "URL: " + url.toString());
                 //make connect with url and send request
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 //waiting for 7000ms for response
@@ -453,7 +447,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void loadTweets(int StartFrom,int UserOperation){
-        Log.v("MainActivity", "Inside LoadTweets");
+        Log.v("MainActivity", "Inside LoadTweets, User ID: " + SaveSettings.UserID);
         this.StartFrom=StartFrom;
         this.userOperation=UserOperation;
         //display loading
@@ -473,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
         if (UserOperation==SearchType.SearchIn)
             url="http://10.0.2.2:8888/SocialAppServer/TweetList.php?user_id="+ SaveSettings.UserID + "&StartFrom="+StartFrom + "&op="+ UserOperation + "&query="+ searchquery;
         if(UserOperation==SearchType.OnePerson)
-            url="http://10.0.2.2:8888/SocialAppServer/TweetList.php/TweetList.php?user_id="+ selectedUserID + "&StartFrom="+StartFrom + "&op="+ UserOperation;
+            url="http://10.0.2.2:8888/SocialAppServer/TweetList.php/TweetList.php?user_id="+ SaveSettings.UserID + "&StartFrom="+StartFrom + "&op="+ UserOperation;
 
         new  MyAsyncTaskgetNews().execute(url);
 
