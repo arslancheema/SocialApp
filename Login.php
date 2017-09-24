@@ -1,5 +1,7 @@
 <?php
 
+// http://localhost:8888/SocialAppServer/Login.php?email=beck@gmail.com&password=2345
+
 require("DbInfo.php");
 
 $query = "SELECT * FROM `login` WHERE email= '".$_GET['email']."' and password = '".$_GET['password']."' ";
