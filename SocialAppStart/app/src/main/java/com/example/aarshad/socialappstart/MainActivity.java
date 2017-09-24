@@ -37,6 +37,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -84,10 +85,11 @@ public class MainActivity extends AppCompatActivity {
         SaveSettings saveSettings = new SaveSettings(getApplicationContext());
         saveSettings.loadData();
 
-        listnewsData.add(new AdapterItems(null, null, null, "add", null, null, null));
+        //listnewsData.add(new AdapterItems(null, null, null, "add", null, null, null));
         myCustomAdapter = new MyCustomAdapter(this, listnewsData);
         ListView lsNews = (ListView) findViewById(R.id.LVNews);
         lsNews.setAdapter(myCustomAdapter);
+        loadTweets(0,SearchType.MyFollowing);
 
     }
 
@@ -139,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.home:
-
+                loadTweets(0,SearchType.MyFollowing);
                 return true;
 
             default:
@@ -237,10 +239,11 @@ public class MainActivity extends AppCompatActivity {
 
                 TextView txt_tweet_date = (TextView) myView.findViewById(R.id.txt_tweet_date);
                 txt_tweet_date.setText(s.tweet_date);
-                // TODO: Picasso Loading
+                // Picasso Library is for image downloading and caching library for Android
                 ImageView tweet_picture = (ImageView) myView.findViewById(R.id.tweet_picture);
-
+                Picasso.with(context).load(s.tweet_picture).into(tweet_picture);
                 ImageView picture_path = (ImageView) myView.findViewById(R.id.picture_path);
+                Picasso.with(context).load(s.picture_path).into(picture_path);
 
                 return myView;
             }
