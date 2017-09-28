@@ -6,10 +6,7 @@ import android.app.SearchManager;
 import android.content.Context;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -49,10 +46,7 @@ import java.io.UnsupportedEncodingException;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -94,7 +88,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void buFollowers(View view) {
+        int operation;
+        String follow=buFollow.getText().toString();
+        if (follow.equalsIgnoreCase("Follow")) {
+            operation = 1;
+            buFollow.setText("Un Follow");
+        }
+        else {
+            operation = 2;
+            buFollow.setText("Follow");
+        }
 
+        String url="http://10.0.2.2:8888/SocialAppServer/UserFollowing.php?user_id="+SaveSettings.UserID +"&following_user_id="+selectedUserID+"&op="+ operation;
+        new  AsyncTaskTweets().execute(url);
 
     }
 
@@ -123,6 +129,8 @@ public class MainActivity extends AppCompatActivity {
                 } catch (UnsupportedEncodingException e) {
 
                 }
+                // Search In Posts
+                loadTweets(0,SearchType.SearchIn);
 
                 return false;
             }
@@ -207,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         String url = "http://10.0.2.2:8888/SocialAppServer/TweetAdd.php?user_id=" + SaveSettings.UserID + "&tweet_text=" + tweets + "&tweet_picture=" + downloadUrl;
 
-                        new MyAsyncTaskgetNews().execute(url);
+                        new AsyncTaskTweets().execute(url);
                         etPost.setText("");
                     }
                 });
@@ -230,7 +238,14 @@ public class MainActivity extends AppCompatActivity {
                 txtUserName.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        // TODO;
+
+                        selectedUserID = Integer.parseInt(s.user_id);
+
+                        loadTweets(0,SearchType.OnePerson);
+                        txtnamefollowers.setText(s.first_name);
+
+                        String url = "http://10.0.2.2:8888/SocialAppServer/IsFollowing.php?user_id=" + SaveSettings.UserID +"&following_user_id=" + selectedUserID;
+                        new AsyncTaskTweets().execute(url);
 
                     }
                 });
@@ -330,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
 
     // AsyncTask to query the server
 
-    public class MyAsyncTaskgetNews extends AsyncTask<String, String, String> {
+    public class AsyncTaskTweets extends AsyncTask<String, String, String> {
         @Override
         protected void onPreExecute() {
             //before works
@@ -411,18 +426,18 @@ public class MainActivity extends AppCompatActivity {
                     myCustomAdapter.notifyDataSetChanged();
 
                 } else if (json.getString("msg").equalsIgnoreCase("no tweet")) {
-//                    //remove we are loading now
-//                    if (StartFrom == 0) {
-//                        listnewsData.clear();
-//                        listnewsData.add(new AdapterItems(null, null, null,
-//                                "add", null, null, null));
-//                    } else {
-//                        //remove we are loading now
-//                        listnewsData.remove(listnewsData.size() - 1);
-//                    }
-//                    // listnewsData.remove(listnewsData.size()-1);
-//                    listnewsData.add(new AdapterItems(null, null, null,
-//                            "notweet", null, null, null));
+                    //remove we are loading now
+                    if (StartFrom == 0) {
+                        listnewsData.clear();
+                        listnewsData.add(new AdapterItems(null, null, null,
+                                "add", null, null, null));
+                    } else {
+                        //remove we are loading now
+                        listnewsData.remove(listnewsData.size() - 1);
+                    }
+                    // listnewsData.remove(listnewsData.size()-1);
+                    listnewsData.add(new AdapterItems(null, null, null,
+                            "notweet", null, null, null));
                 } else if (json.getString("msg").equalsIgnoreCase("is subscriber")) {
                     buFollow.setText("Un Follow");
                 } else if (json.getString("msg").equalsIgnoreCase("is not subscriber")) {
@@ -470,9 +485,9 @@ public class MainActivity extends AppCompatActivity {
         if (UserOperation==SearchType.SearchIn)
             url="http://10.0.2.2:8888/SocialAppServer/TweetList.php?user_id="+ SaveSettings.UserID + "&StartFrom="+StartFrom + "&op="+ UserOperation + "&query="+ searchquery;
         if(UserOperation==SearchType.OnePerson)
-            url="http://10.0.2.2:8888/SocialAppServer/TweetList.php/TweetList.php?user_id="+ SaveSettings.UserID + "&StartFrom="+StartFrom + "&op="+ UserOperation;
+            url="http://10.0.2.2:8888/SocialAppServer/TweetList.php?user_id="+ selectedUserID + "&StartFrom="+StartFrom + "&op="+ UserOperation;
 
-        new  MyAsyncTaskgetNews().execute(url);
+        new AsyncTaskTweets().execute(url);
 
         if (UserOperation==SearchType.OnePerson)
             channelInfo.setVisibility(View.VISIBLE);
